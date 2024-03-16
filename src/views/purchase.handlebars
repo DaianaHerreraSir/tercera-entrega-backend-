@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Encabezado de la vista del carrito -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orden de Compras</title>
+</head>
+<body>
+
+  <h1>Orden de Compras</h1>
+
+  {{#if cart.products}}
+    <!-- Lista de productos en el carrito -->
+    <ul>
+      {{#each cart.products}}
+        <li>
+          <h2>Producto: {{this.product.title}}</h2>
+          <p>Descripción: {{this.product.description}}</p>
+          <p>Precio: {{this.product.price}}</p>
+          <p>Cantidad: {{this.quantity}}</p>
+        </li>
+      {{/each}}
+    </ul>
+{{#if ticket}}
+      <h3>Total de la compra: {{ticket.amount}}</h3>
+    {{/if}}
+    <!-- Botón para finalizar la compra -->
+    <form action="http://localhost:8083/api/products" method="POST">
+      <button type="submit">Pagar</button>
+    </form>
+
+  {{else}}
+    <!-- Mensaje si el carrito está vacío -->
+    <p>El carrito está vacío.</p>
+  {{/if}}
+
+</body>
+</html>

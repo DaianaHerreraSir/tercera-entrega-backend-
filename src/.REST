@@ -1,0 +1,25 @@
+POST http://localhost:8083/api/session/register
+Content-Type: application/json
+
+{    
+    "first_name": "Dia",
+    "last_name": "herre",
+    "email":"daiu@gmail.com", 
+"password": "3234"
+}
+
+
+###
+
+
+POST http://localhost:8083/api/session/login
+Content-Type: application/json
+
+
+{"email":"daiu@gmail.com", 
+"password": "3234"
+}
+
+###
+GET http://localhost:8083/api/session/current
+authorization: BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdF9uYW1lIjoiRGlhIiwiZW1haWwiOiJkYWl1QGdtYWlsLmNvbSIsImlkIjoiNjVkNjMxZGE0NzMyYjFmNDFkM2Q4YTgwIiwiaWF0IjoxNzA4NTM4MzA0LCJleHAiOjE3MDg2MjQ3MDR9.v9yutJcS4CaFYYgBq9aDYMBj7vaePrOgStw2BS9AwEk
