@@ -17,6 +17,10 @@ const cartsSchema = new Schema({
     stock: Number,
     status: Boolean,
     category: String,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     products: [{
         product: { type: Schema.Types.ObjectId, ref: productModel },
         quantity: { type: Number, default: 0 }

@@ -17,7 +17,7 @@ viewRouter.get("/login",viewLogin )
 
 viewRouter.get("/register", viewRegister)
 
-viewRouter.get("/api/carts/:cid/purchase", viewPurchase)
+viewRouter.get("/carts/:cid/purchase", viewPurchase)
 
 
 

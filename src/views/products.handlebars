@@ -12,6 +12,11 @@
   {{/if}}
 
   {{#if payload}}
+
+  {{#if payload.user}}
+      <h1>Bienvenido, {{payload.user.email}} (Rol: {{payload.user.role}})</h1>
+
+    {{/if}}
     {{#if payload.products}}
       <h1>Lista de Productos</h1>
       
@@ -23,13 +28,14 @@
           <p>Precio:{{this.price}}</p>
           <p>Categoria:{{this.category}}</p>
 
-        <form action="http://localhost:8083/api/carts/65c21b7777f71b6c8044d2a9/products/{{this._id}}" method="POST">
+      <form action="http://localhost:8083/api/carts/65fb196ddb6531a28fe07489/products/{{this._id}}" method="POST">
               <input type="hidden" name="title" value="{{this.title}}">
               <input type="hidden" name="description" value="{{this.description}}">
               <input type="hidden" name="price" value="{{this.price}}">
-              <input type="hidden" name="quantity" value="1">
+              <input type="hidden" name="quantity" value="{{this.quantity}}">
               <button type="submit">Agregar al carrito</button>
             </form>
+
           </li>
         {{/each}}
       </ul>
@@ -49,6 +55,8 @@
     {{/if}}
   {{/if}}
 </div>
+
+<script src="/src/public/js/index.js"></script>
 </body>
 </html>
 

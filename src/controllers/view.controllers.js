@@ -1,8 +1,10 @@
 import ProductsManagerMongo from "../daos/Mongo/ProductsDaoMongo.js";
+import UserDaoMongo from "../daos/Mongo/UserDaoMongo.js";
 
 export class ViewControllers {
         constructor(){
             this.productService = new ProductsManagerMongo()
+       
         }
 
 getViewProduct =  async (req, res) => {
@@ -29,9 +31,11 @@ getViewProduct =  async (req, res) => {
             page
         } = await this.productService.paginate(queryOptions, { limit, page: pageQuery, sort: { price: -1 }, lean: true });
 
+        const user = req.user
         res.render("products", {
             status: "success",
             payload: {
+                user: user,
                 products: docs,
                 hasPrevPage,
                 hasNextPage,

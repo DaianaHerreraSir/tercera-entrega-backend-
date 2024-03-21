@@ -20,11 +20,10 @@ sessionRouter.post("/login", login )
 //CURRENT
 sessionRouter.get("/current", passportCall("jwt"), authorization(["USER", "ADMIN"]) , current)
 //GITHUB
-sessionRouter.get("/github", passport.authenticate("github", 
-{scope: ['user: email']}), github
-);
+sessionRouter.get("/github",passport.authenticate("github", { session: false, failureRedirect: "/login" }), github);
 //GITHUBCALLBACK
-sessionRouter.get("/githubcallback",passport.authenticate("github",{ session: false }, {failureRedirect:"/login"} ), githubcallback)
+sessionRouter.get("/githubcallback", passport.authenticate("github", { session: false, failureRedirect: "/login" }), githubcallback);
+
 
 
 

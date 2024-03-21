@@ -7,10 +7,11 @@ import UserDaoMongo from "./Mongo/UserDaoMongo.js";
 
 
 
-export let UserDao
+
 export let ProductDao 
 export let CartDao
 export let TicketsDao
+export let UserDao
 
 switch (configObject.persistence) {
     case "FILE":
@@ -22,10 +23,11 @@ switch (configObject.persistence) {
         connectDB() 
         
 
-        UserDao = UserDaoMongo;
+        
         ProductDao= ProductDaoMongo;
         CartDao= CartDaoMongo;
-        TicketsDao = TicketDaoMongo
+        TicketsDao = TicketDaoMongo;
+        UserDao = UserDaoMongo
 
     
 

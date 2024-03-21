@@ -1,37 +1,47 @@
 
-import { CartDao, ProductDao, TicketsDao } from "../daos/factory.js";
+import { CartDao, ProductDao, TicketsDao, UserDao,} from "../daos/factory.js";
 
 export class CartControllers {
         constructor (){
             this.cartService =new  CartDao()
             this.ticketService = new TicketsDao ()
             this.productService = new ProductDao()
+            this.userService = new UserDao()
         }
 //CREO UN CARRITO
 createCart = async (req, res) => {
-  
-    try {
-  
-      const newCart = await this.cartService.createCart();
-      console.log('Nuevo carrito:', newCart);
-  
-      if (!newCart) {
-        console.error('Error al crear el carrito. newCart es null o undefined.');
-        res.status(500).send('Error al crear el carrito');
-        return;
-      }
-  
-    const cartId = newCart._id;
-  
-    const updatedCart = await this.cartService.getCart(cartId);
-  
-    res.json(updatedCart);
-    } 
-    catch (error) {
-      console.error("ERROR AL CREAR CARRITO", error);
-      res.status(500).send("Error al crear carrito");
+  try {
+    const userId = req.user._id; 
+    const newCart = await this.cartService.createCart();
+    console.log('Nuevo carrito:', newCart);
+
+    if (!newCart) {
+      console.error('Error al crear el carrito. newCart es null o undefined.');
+      res.status(500).send('Error al crear el carrito');
+      return;
     }
+
+    const cartId = newCart._id;
+    // Actualizar el campo cartID del usuario con el ID del carrito creado
+    const updatedUser = await this.userService.findByIdAndUpdate(userId, { cartID: cartId }, { new: true });
+
+    // Verificar si se pudo actualizar el usuario
+    if (!updatedUser) {
+      console.error('Error al actualizar el campo cartID del usuario.');
+      res.status(500).send('Error al actualizar el campo cartID del usuario.');
+      return;
+    }
+
+    // Obtener el carrito actualizado
+    const updatedCart = await this.cartService.getCart(cartId);
+
+    res.json(updatedCart);
+  } catch (error) {
+    console.error("ERROR AL CREAR CARRITO", error);
+    res.status(500).send("Error al crear carrito");
   }
+}
+
 //OBTENGO EL CARRITO POR SU ID
 getCart =async (req, res) => {
     const { cid } = req.params;
@@ -39,7 +49,7 @@ getCart =async (req, res) => {
     try {
       const cart = await this.cartService.getCart(cid);
       console.log(cart); // Agrega este console.log para verificar la estructura de cart
-      res.render("carts", { cart });
+      res.render("products", { cart });
     } catch (error) {
       console.error("Error al obtener el carrito:", error);
       res.status(500).send("Error al obtener carrito");
@@ -47,19 +57,39 @@ getCart =async (req, res) => {
   }
 //AGREGO UN PRODUCTO POR EL ID DEL PRODUCTO
 addProductToCart = async (req, res) => {
-    const { cid, pid } = req.params;
-    const { title, description, price, quantity } = req.body;
-  
-    try {
-        console.log("pid:", pid);
-        const updatedCart = await this.cartService.addProductToCart(cid, pid, title, description, price, quantity);
-        // res.json(updatedCart);
-        res.send("Producto agregado al carrito")
-    } catch (error) {
-        console.error("Error al agregar producto al carrito:", error);
-        res.status(500).send(`Error al agregar producto al carrito: ${error.message}`);
+  const { pid } = req.params; // 
+  const { title, description, price, quantity } = req.body; 
+  const userId = req.user.id; 
+  try {
+   
+    let user = await this.userService.getUserById(userId);
+    let cartId = null;
+
+    if (!user || !user.cartID) {
+      
+      const newCart = await this.cartService.createCart();
+      cartId = newCart._id;
+
+     
+      user = await this.userService.updateUserCartId(userId, cartId);
+    } else {
+      
+      cartId = user.cartID;
     }
+
+    // Agrega el producto al carrito
+    const updatedCart = await this.cartService.addProductToCart(cartId, pid, title, description, price, quantity);
+
+    // Responder con un mensaje de éxito
+    res.send("Producto agregado al carrito correctamente.");
+  } catch (error) {
+    console.error("Error al agregar producto al carrito:", error);
+    res.status(500).send(`Error al agregar producto al carrito: ${error.message}`);
   }
+}
+
+
+
 //ELIMINO EL CARRITO POR SU ID
 deleteCart =async (req, res) => {
     
@@ -165,7 +195,7 @@ postPurchase =async (req, res)=> {
           code: generateUniqueCode(),
           purchase_datetime: new Date(),
           amount: total,
-          // purchaser: req.users.email 
+          purchaser: req.user.email 
       };
 
       const ticket = await this.ticketService.createTicket(ticketData);

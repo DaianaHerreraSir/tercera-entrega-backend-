@@ -1,3 +1,4 @@
+import { authToken } from "../../utils/jsonwebtoken.js";
 
 const socket = io();
 
@@ -96,13 +97,28 @@ socket.on('updateProducts', (data) => {
 });
 
 
-// fetch tocken
 
-// fetch(url, {
-//   method: "POST",
-//   headers:{
-//     "content-type": "application/json",
-//     "Authorization": `Beare ${sessionStorage.getItem("token")} `
-//   }, 
-//   body: JSON.stringify({user: user})
-//   }) 
+
+// fetch tocken
+const token = authToken()
+const url = `http://localhost:8083/api/carts/65fb196ddb6531a28fe07489/products/${this._id}`;
+fetch(url, {
+  method: "POST",
+  headers:{
+    "content-type": "application/json",
+    "Authorization": `Bearer ${token}`  // Aquí es donde debes incluir el token JWT
+  }, 
+  body: JSON.stringify({product: product})
+}) 
+.then(response => {
+  if (!response.ok) {
+    throw new Error('No se pudo agregar el producto al carrito.');
+  }
+  return response.json();
+})
+.then(data => {
+  console.log('Producto agregado al carrito:', data);
+})
+.catch(error => {
+  console.error('Error al agregar producto al carrito:', error);
+});
