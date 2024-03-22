@@ -98,27 +98,30 @@ socket.on('updateProducts', (data) => {
 
 
 
+// const token = localStorage.getItem('token'); //
+// console.log('Tokens:', token);
 
-// fetch tocken
-const token = authToken()
-const url = `http://localhost:8083/api/carts/65fb196ddb6531a28fe07489/products/${this._id}`;
-fetch(url, {
-  method: "POST",
-  headers:{
-    "content-type": "application/json",
-    "Authorization": `Bearer ${token}`  // Aquí es donde debes incluir el token JWT
-  }, 
-  body: JSON.stringify({product: product})
-}) 
-.then(response => {
-  if (!response.ok) {
-    throw new Error('No se pudo agregar el producto al carrito.');
-  }
-  return response.json();
-})
-.then(data => {
-  console.log('Producto agregado al carrito:', data);
-})
-.catch(error => {
-  console.error('Error al agregar producto al carrito:', error);
-});
+// const url = `http://localhost:8083/api/carts/65fb20a80f19ae91277ef67d/products/${this._id}`;
+
+// // Realizar la solicitud POST para agregar el producto al carrito
+// fetch(url, {
+//   method: "POST",
+//   headers:{
+//     "Content-Type": "application/json",
+//     "authorization": `Bearer ${token}` 
+//   }, 
+//   body: JSON.stringify({product: product})
+// }) 
+// .then(response => {
+//   if (!response.ok) {
+//     throw new Error('No se pudo agregar el producto al carrito.');
+//   }
+//   return response.json();
+// })
+// .then(data => {
+//   console.log('Producto agregado al carrito:', data);
+// })
+// .catch(error => {
+//   console.error('Error al agregar producto al carrito:', error);
+// });
+

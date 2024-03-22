@@ -6,18 +6,7 @@ import { UserControllers } from "../controllers/user.controllers.js";
 
 const userRouter = Router()
 
-// userRouter.get("/", passportCall("jwt"),authorization(["USER_PREMIUM", "ADMIN"]), async(req, res)=>{
-//     try {
-//         const users = await usersModel.find({isActive: true})
-//         res.json({
-//             status: "succes",
-//             results: users
-//         })
-//     } catch (error) {
-//         console.log(error);
-        
-//     }
-// })
+ 
 const { getUsers,
         getUserBy,
         createUser,

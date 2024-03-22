@@ -2,8 +2,7 @@
 import { Router } from "express";
 import CartManagerMongo from "../daos/Mongo/CartDaoMongo.js";
 import { CartControllers } from "../controllers/carts.controllers.js";
-import authorization from "../middleware/authentication.middleware.js";
-import { authToken } from "../utils/jsonwebtoken.js";
+
 
 const cartsRouter = Router();
 
@@ -29,7 +28,7 @@ cartsRouter.get("/:cid", getCart);
 
 //agrego un producto por el id del producto
 
-cartsRouter.post("/:cid/products/:pid",authToken,authorization(["USER"]), addProductToCart );
+cartsRouter.post("/:cid/products/:pid", addProductToCart );
 
 
 

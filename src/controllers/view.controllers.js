@@ -46,6 +46,7 @@ getViewProduct =  async (req, res) => {
         });
     } catch (error) {
         console.log(error);
+        
         res.render("products", {
             status: "error",
             payload: {

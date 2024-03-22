@@ -1,12 +1,19 @@
 import jwt from 'jsonwebtoken';
 import { configObject } from '../config/connectDB.js';
 
-const {jwt_private_key} = configObject
+const { jwt_private_key } = configObject;
 
-export const generateToken = (user) =>  jwt.sign(user, jwt_private_key, 
-        {expiresIn: "24h"});
+export const generateToken = (userData) => {
+    console.log(userData);
+    const { _id, username, role } = userData; 
+    const user = {
+        _id: _id,
+        username: username,
+        role: role
+    };
+    return jwt.sign(user, jwt_private_key, { expiresIn: "24h" });
+}; 
 
-        
         export const authToken = (req, res, next) => {
             const authHeader = req.headers["authorization"];
             if (!authHeader) {

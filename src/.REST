@@ -19,7 +19,11 @@ Content-Type: application/json
 {"email":"daiu@gmail.com", 
 "password": "3234"
 }
+###
 
+POST http://localhost:8083/api/carts/65fb20a80f19ae91277ef67d/products/65ac056d91a6826fb3a01315
 ###
 GET http://localhost:8083/api/session/current
-authorization: BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdF9uYW1lIjoiRGlhIiwiZW1haWwiOiJkYWl1QGdtYWlsLmNvbSIsImlkIjoiNjVkNjMxZGE0NzMyYjFmNDFkM2Q4YTgwIiwiaWF0IjoxNzA4NTM4MzA0LCJleHAiOjE3MDg2MjQ3MDR9.v9yutJcS4CaFYYgBq9aDYMBj7vaePrOgStw2BS9AwEk
+Content-Type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiVVNFUiIsImlhdCI6MTcxMTEzNDM2OSwiZXhwIjoxNzExMjIwNzY5fQ.0-70d1LLCh98N1dScwI47ssgS5bp4bBBpJKs6MqhvL0
+

@@ -20,26 +20,25 @@
     {{#if payload.products}}
       <h1>Lista de Productos</h1>
       
-      <ul>
-        {{#each payload.products}}
-          <h2>Producto:{{this.title}}</h2>
-          <p>Descripcion:{{this.description}}</p>
-          <p>imagen:{{this.thumbnail}}</p>
-          <p>Precio:{{this.price}}</p>
-          <p>Categoria:{{this.category}}</p>
+    <ul>
+  {{#each payload.products}}
+    <li>
+      <h2>Producto: {{this.title}}</h2>
+      <p>Descripción: {{this.description}}</p>
+      <p>Imagen: {{this.thumbnail}}</p>
+      <p>Precio: {{this.price}}</p>
+      <p>Categoría: {{this.category}}</p>
 
-      <form action="http://localhost:8083/api/carts/65fb196ddb6531a28fe07489/products/{{this._id}}" method="POST">
-              <input type="hidden" name="title" value="{{this.title}}">
-              <input type="hidden" name="description" value="{{this.description}}">
-              <input type="hidden" name="price" value="{{this.price}}">
-              <input type="hidden" name="quantity" value="{{this.quantity}}">
-              <button type="submit">Agregar al carrito</button>
-            </form>
-
-          </li>
-        {{/each}}
-      </ul>
-
+      <form action="http://localhost:8083/api/carts/65fb20a80f19ae91277ef67d/products/{{this._id}}" method="POST">
+        <input type="hidden" name="title" value="{{this.title}}">
+        <input type="hidden" name="description" value="{{this.description}}">
+        <input type="hidden" name="price" value="{{this.price}}">
+        <input type="hidden" name="quantity" value="{{this.quantity}}">
+        <button type="submit">Agregar al carrito</button>
+      </form>
+    </li>
+  {{/each}}
+</ul>
 
         <div>
         {{#if payload.hasPrevPage}}
@@ -56,7 +55,7 @@
   {{/if}}
 </div>
 
-<script src="/src/public/js/index.js"></script>
+
 </body>
 </html>
 

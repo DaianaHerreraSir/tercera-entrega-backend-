@@ -1,5 +1,6 @@
 
 import { CartDao, UserDao } from "../daos/factory.js";
+import { UserDto } from "../dto/userDto.js";
 import { createHash, isValidPassword } from "../utils/hashBcrypt.js";
 import { generateToken } from "../utils/jsonwebtoken.js";
 
@@ -47,6 +48,7 @@ res.cookie("cookieToken", token,{
 }
 
 //LOGIN
+//LOGIN
 login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -59,11 +61,13 @@ login = async (req, res) => {
 
         // TOKEN
         const tokenPayload = {
-            id: user._id,
+            _id: user._id,
+            username: user.username,
             email: user.email,
             role: user.role
         };
         const token = generateToken(tokenPayload);
+        console.log("Token:", token);
 
         // Verificar si el usuario tiene un carrito asociado
         if (!user.cartID) {
@@ -73,13 +77,14 @@ login = async (req, res) => {
             await this.userService.updateUser(user._id, { cartID: newCart._id });
         }
 
-        // Establecer la cookie del token
+       
         res.cookie("cookieToken", token, {
-            maxAge: 60 * 60 * 1000 * 24,
-            httpOnly: true
+            maxAge: 60 * 60 * 1000 * 24, 
+            httpOnly: true,
+            
         });
 
-        // Redireccionar al usuario a la página deseada después del inicio de sesión exitoso
+    
         res.redirect("/products");
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
@@ -87,71 +92,15 @@ login = async (req, res) => {
     }
 }
 
-// login = async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
 
-//         const user = await this.userService.getUserBy({ email });
-//         if (!isValidPassword(password, user.password)) return res.status(401).send("contraseña incorrecta");
-
-//         //TOKEN
-//         const token = generateToken({
-//             id: user._id,
-//             email: user.email,
-//             role: user.role
-//         });
-
-//         res.cookie("cookieToken", token, {
-//             maxAge: 60 * 60 * 1000 * 24,
-//             httpOnly: true
-//         });
-//         res.redirect("/products");
-//     } catch (error) {
-//         console.log(error);
-//         res.send({ status: "error", error });
-//     }
-// }
-
-
-// login =async(req,res)=>{
-
-// try {
-//         const {email, password}= req.body
-
-//     const user= await this.userService.getUserBy({email})
-//     if(!isValidPassword(password, user.password)) return res.status(401).send("contraseña incorrecta")
-
-// //TOKEN
-// const token = generateToken({
-//     id: user._id,
-//     email: user.email,
-//     role: user.role
-//     })
-
-//     res.cookie("cookieToken", token, {
-//         maxAge : 60 * 60 * 1000 *24,
-//         httpOnly: true
-//     }).send({
-//         status: "success",
-//         usersCreate: "login success", 
-//         token
-//     })
-//     res.redirect("/products");
-// } catch (error) {
-//     console.log(error);
-// res.send({status: "error", error})  
-// }
-
-// }
 //CURRENT
-
-current =async(req,res)=>{
-try {
-    const userDto = new userDto(req.user); 
-    res.send({ user: userDto, message: "Información del usuario" });
-} catch (error) {
-    res.send({ status: "error", error });
-}
+ current = async (req, res) => {
+    try {
+        const userDto = new UserDto(req.user); 
+        res.send({ user: userDto, message: "Información del usuario" });
+    } catch (error) {
+        res.send({ status: "error", error });
+    }
 };
 
 
@@ -170,9 +119,8 @@ github = async (req, res) => {
 //GITHUBCALLBACK
 githubcallback = async(req, res) => {
     try {
-        // Verificar si req.user está definido
         if (!req.user) {
-            // Si req.user no está definido, enviar un mensaje de error
+        
             return res.status(401).json({ status: "error", error: "User not authenticated" });
         }
 

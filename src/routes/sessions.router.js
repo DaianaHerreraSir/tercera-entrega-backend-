@@ -18,7 +18,7 @@ sessionRouter.post("/register", register )
 //LOGIN
 sessionRouter.post("/login", login )
 //CURRENT
-sessionRouter.get("/current", passportCall("jwt"), authorization(["USER", "ADMIN"]) , current)
+sessionRouter.get("/current", passportCall("jwt"), authorization(["USER"]) , current)
 //GITHUB
 sessionRouter.get("/github",passport.authenticate("github", { session: false, failureRedirect: "/login" }), github);
 //GITHUBCALLBACK

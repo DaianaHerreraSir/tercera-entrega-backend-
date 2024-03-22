@@ -48,8 +48,8 @@ getCart =async (req, res) => {
   
     try {
       const cart = await this.cartService.getCart(cid);
-      console.log(cart); // Agrega este console.log para verificar la estructura de cart
-      res.render("products", { cart });
+      console.log(cart); 
+      res.render("products", { cart: updatedCart })
     } catch (error) {
       console.error("Error al obtener el carrito:", error);
       res.status(500).send("Error al obtener carrito");
@@ -57,36 +57,39 @@ getCart =async (req, res) => {
   }
 //AGREGO UN PRODUCTO POR EL ID DEL PRODUCTO
 addProductToCart = async (req, res) => {
-  const { pid } = req.params; // 
-  const { title, description, price, quantity } = req.body; 
-  const userId = req.user.id; 
   try {
-   
-    let user = await this.userService.getUserById(userId);
-    let cartId = null;
+    const { pid } = req.params;
+    const { title, description, price, quantity } = req.body;
 
-    if (!user || !user.cartID) {
-      
+    // Obtener el ID de usuario
+    const userId = req.user._id;
+    console.log(userId);
+
+   //Verificar si el usuario tiene carrito 
+    let user = await this.userService.getUserById(userId);
+    let cartId = user.cartID;
+
+    // Sino creo uno
+    if (!cartId) {
       const newCart = await this.cartService.createCart();
       cartId = newCart._id;
 
-     
+      //id nuevo del carrito
       user = await this.userService.updateUserCartId(userId, cartId);
-    } else {
-      
-      cartId = user.cartID;
     }
 
-    // Agrega el producto al carrito
-    const updatedCart = await this.cartService.addProductToCart(cartId, pid, title, description, price, quantity);
+    // Agrego producto con el id del producto
+    await this.cartService.addProductToCart(cartId, { pid, title, description, price, quantity });
 
-    // Responder con un mensaje de éxito
-    res.send("Producto agregado al carrito correctamente.");
+    res.status(200).json({ message: 'Producto agregado al carrito correctamente' });
   } catch (error) {
-    console.error("Error al agregar producto al carrito:", error);
-    res.status(500).send(`Error al agregar producto al carrito: ${error.message}`);
+    console.error('Error al agregar producto al carrito:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
+
+
+
 
 
 
@@ -106,6 +109,30 @@ deleteCart =async (req, res) => {
         res.status(500).send('Error al eliminar el carrito');
       }
     }
+
+    //ACTUALIZO CARRITO CON UN ARREGLO DE PRODUCTOS
+updateCartProducts = async (req, res) => {
+  const { cid } = req.params;
+  const products = req.body;
+
+  try {
+   
+      if (!products || !Array.isArray(products) || products.length === 0) {
+          throw new Error('No se proporcionaron productos válidos en la solicitud.');
+      }
+
+      //
+      const updatedCart = await this.cartService.updateCartProducts(cid, products);
+
+      //
+      res.json(updatedCart);
+  } catch (error) {
+      console.error("Error al actualizar el carrito:", error);
+      // Enviar una respuesta de error con un mensaje descriptivo
+      res.status(500).send(`Error al actualizar el carrito: ${error.message}`);
+  }
+}
+
 //ELIMINO UN PRODUCTO DEL CARRITO POR EL ID
 removeProductFromCart = async (req, res) => {
     const { cid, pid } = req.params;
@@ -131,18 +158,6 @@ clearCart = async (req, res) => {
     }
   }
 
-//ACTUALIZO CARRITO CON UN ARREGLO DE PRODUCTOS
-updateCartProducts = async (req, res) => {
-    const { cid } = req.params;
-    const products = req.body;
-  
-    try {
-      await this.cartService.updateCartProducts(cid, products, res);
-    } catch (error) {
-      console.error("Error al actualizar el carrito:", error);
-      res.status(500).send(`Error al actualizar el carrito: ${error.message}`);
-    }
-  }
 //ACTUALIZO CANTIDAD DE PRODUCTO EN UN EL CARRITO
 updateProductQuantity = async (req, res) => {
     const { cid, pid } = req.params;
