@@ -12,20 +12,23 @@ async getProducts(){
     }
   }
 
-async getProduct() {
+  async getProduct(productId) {
     try {
+      const product = await productModel.findById(productId);
 
-      const products = await productModel.findOne({isActive: true});
+      console.log('Producto recuperado:', product);
+      if (!product) {
+        throw new Error('Producto no encontrado');
+      }
+  
 
-      console.log('Productos recuperados:', products);
-
-      return products;
-
+      return product;
     } catch (error) {
-      console.error('Error en getProducts:', error);
+      console.error('Error en getProduct:', error);
       throw error;
     }
-  }
+}
+
 
 async createProduct(productNew) {
     try {

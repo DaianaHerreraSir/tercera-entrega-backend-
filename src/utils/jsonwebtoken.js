@@ -5,14 +5,18 @@ const { jwt_private_key } = configObject;
 
 export const generateToken = (userData) => {
     console.log(userData);
-    const { _id, username, role } = userData; 
+    const { _id,email,cartID, role, } = userData; 
     const user = {
+    
         _id: _id,
-        username: username,
-        role: role
-    };
+        email: email,
+        role: role,
+        cartID: cartID
+        
+    }; console.log(user);
     return jwt.sign(user, jwt_private_key, { expiresIn: "24h" });
 }; 
+
 
         export const authToken = (req, res, next) => {
             const authHeader = req.headers["authorization"];

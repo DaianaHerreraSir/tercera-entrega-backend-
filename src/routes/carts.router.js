@@ -3,6 +3,8 @@ import { Router } from "express";
 import CartManagerMongo from "../daos/Mongo/CartDaoMongo.js";
 import { CartControllers } from "../controllers/carts.controllers.js";
 
+import authorization from "../middleware/authentication.middleware.js";
+import { passportCall } from "../middleware/passportCall.js";
 
 const cartsRouter = Router();
 
@@ -13,23 +15,25 @@ const{createCart,
       removeProductFromCart,
       clearCart,
       updateCartProducts,
-      updateProductQuantity,
-      getPopulatedCart,
-      postPurchase
-     } =  new CartControllers ()
+      postPurchase,
+      getCartProducts,
+      
+} =  new CartControllers()
 
 
-  //creo un carrito
+//creo un carrito
 cartsRouter.post("/", createCart);
 
 //obtengo el carrito por su id
 cartsRouter.get("/:cid", getCart);
 
+//obtengo el producto del carrito 
+cartsRouter.get('/carts/:cid/products',getCartProducts)
+
 
 //agrego un producto por el id del producto
 
-cartsRouter.post("/:cid/products/:pid", addProductToCart );
-
+cartsRouter.post("/:cid/products/:pid", passportCall('jwt'), authorization(['USER']),addProductToCart);
 
 
 //elimino el carrito por su id
@@ -44,18 +48,11 @@ cartsRouter.delete('/api/carts/:cid', clearCart );
 // Actualizar carrito con un arreglo de productos
 cartsRouter.put('/:cid', updateCartProducts);
 
-// Actualizar cantidad de un producto en el carrito
-cartsRouter.put('/:cid/products/:pid', updateProductQuantity );
-
-
-
-// carrito con productos completos
-cartsRouter.get("/:cid", getPopulatedCart );
-
-// Método para finalizar la compra de un carrito
-
 // Implementación de la ruta /:cid/purchase
 cartsRouter.post('/:cid/purchase',postPurchase)
+
+
+
 
 export default cartsRouter;
 

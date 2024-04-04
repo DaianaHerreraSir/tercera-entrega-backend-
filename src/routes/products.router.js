@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ProductControllers } from "../controllers/products.controllers.js";
+import { CartControllers } from "../controllers/carts.controllers.js";
 
 
 const productsRouter = Router();
@@ -10,6 +11,7 @@ const{getProduct,
       updateProduct,
       deletProduct
       } = new ProductControllers ()
+
 
 productsRouter.get("/", getProducts )
 

@@ -20,10 +20,12 @@ Content-Type: application/json
 "password": "3234"
 }
 ###
-
-POST http://localhost:8083/api/carts/65fb20a80f19ae91277ef67d/products/65ac056d91a6826fb3a01315
+POST http://localhost:8083/carts/users/65fb1fe70f19ae91277ef679/restore-cart
 ###
 GET http://localhost:8083/api/session/current
 Content-Type: application/json
 authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiVVNFUiIsImlhdCI6MTcxMTEzNDM2OSwiZXhwIjoxNzExMjIwNzY5fQ.0-70d1LLCh98N1dScwI47ssgS5bp4bBBpJKs6MqhvL0
 
+###
+
+DELETE  http://localhost:8083/api/users/65fb1fe70f19ae91277ef679/carts/65fb20a80f19ae91277ef67d

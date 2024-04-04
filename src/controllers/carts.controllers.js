@@ -1,13 +1,12 @@
-
+import cartModel from "../daos/Mongo/models/carts.models.js";
 import { CartDao, ProductDao, TicketsDao, UserDao,} from "../daos/factory.js";
-
+import { Types } from 'mongoose';
 export class CartControllers {
         constructor (){
             this.cartService =new  CartDao()
             this.ticketService = new TicketsDao ()
             this.productService = new ProductDao()
-            this.userService = new UserDao()
-        }
+            this.userService = new UserDao()}
 //CREO UN CARRITO
 createCart = async (req, res) => {
   try {
@@ -43,54 +42,90 @@ createCart = async (req, res) => {
 }
 
 //OBTENGO EL CARRITO POR SU ID
+
+
 getCart =async (req, res) => {
-    const { cid } = req.params;
-  
-    try {
-      const cart = await this.cartService.getCart(cid);
-      console.log(cart); 
-      res.render("products", { cart: updatedCart })
-    } catch (error) {
-      console.error("Error al obtener el carrito:", error);
-      res.status(500).send("Error al obtener carrito");
-    }
+  const { cid } = req.params;
+
+  try {
+    const cart = await this.cartService.getCart(cid);
+    console.log("obtencion del carrito",cart); 
+    res.render("carts", { cart });
+  } catch (error) {
+    console.error("Error al obtener el carrito:", error);
+    res.status(500).send("Error al obtener carrito");
   }
+}
+//OBTENER EL PRODUCTO DEL CARRITO 
+
+getCartProducts = async (req, res) => {
+  const { cartId } = req.params;
+
+  try {
+    const products = await this.cartService.getCartProducts(cartId);
+    if (!products) {
+      return res.status(404).json({ error: 'Carrito no encontrado' });
+    }
+    res.json(products);
+  } catch (error) {
+    console.error('Error al obtener los productos del carrito:', error);
+    res.status(500).json({ error: 'Error al obtener los productos del carrito' });
+  }
+}
+
 //AGREGO UN PRODUCTO POR EL ID DEL PRODUCTO
 addProductToCart = async (req, res) => {
   try {
     const { pid } = req.params;
-    const { title, description, price, quantity } = req.body;
+    const { userId } = req.user;
+    console.log("ID DEL PRODUCTO", pid);
 
-    // Obtener el ID de usuario
-    const userId = req.user._id;
-    console.log(userId);
-
-   //Verificar si el usuario tiene carrito 
-    let user = await this.userService.getUserById(userId);
+    // Obtener el ID del carrito asociado al usuario
+    const user = await this.userService.getUserBy(userId);
     let cartId = user.cartID;
 
-    // Sino creo uno
+    // Si el usuario no tiene un carrito asociado, crear uno nuevo
     if (!cartId) {
       const newCart = await this.cartService.createCart();
       cartId = newCart._id;
 
-      //id nuevo del carrito
-      user = await this.userService.updateUserCartId(userId, cartId);
+      // Actualizar el ID del carrito en el usuario
+      await this.userService.updateUserCartId(userId, cartId);
     }
 
-    // Agrego producto con el id del producto
-    await this.cartService.addProductToCart(cartId, { pid, title, description, price, quantity });
-
-    res.status(200).json({ message: 'Producto agregado al carrito correctamente' });
-  } catch (error) {
-    console.error('Error al agregar producto al carrito:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
+    // Obtener el producto
+    const product = await this.productService.getProduct(pid);
+    
+    // Verificar si el producto existe
+    if (!product) {
+      return res.status(404).json({ error: 'El producto no existe' });
+    }
+// Obtener el carrito y verificar si existe
+const cart = await this.cartService.getCart(cartId);
+if (!cart) {
+  throw new Error('No se pudo encontrar el carrito');
 }
 
+// Verificar si el producto ya está en el carrito
+const existingProductIndex = cart.products.findIndex(item => item._id.toString() === pid);
+if (existingProductIndex !== -1) {
+  // Si el producto ya está en el carrito, aumentar la cantidad
+  cart.products[existingProductIndex].quantity += 1;
+} else {
+  // Si el producto no está en el carrito, agregarlo
+  cart.products.push({ _id: pid, quantity: 1 });
+}
 
+// Guardar los cambios en el carrito
+await cart.save();
 
-
+    // Redirigir al usuario al carrito
+    res.redirect(`/api/carts/${cartId}`);
+  } catch (error) {
+    console.error('Error al agregar producto al carrito:', error);
+    res.status(500).send('Error al agregar el producto al carrito');
+  }
+}
 
 
 //ELIMINO EL CARRITO POR SU ID
@@ -110,7 +145,7 @@ deleteCart =async (req, res) => {
       }
     }
 
-    //ACTUALIZO CARRITO CON UN ARREGLO DE PRODUCTOS
+//ACTUALIZO CARRITO CON UN ARREGLO DE PRODUCTOS
 updateCartProducts = async (req, res) => {
   const { cid } = req.params;
   const products = req.body;
@@ -146,6 +181,7 @@ removeProductFromCart = async (req, res) => {
       res.status(500).send(`Error al eliminar producto del carrito: ${error.message}`);
     }
   }
+
 //ELIMINO TODOS LOS PRODUCTOS DEL CARRITO
 clearCart = async (req, res) => {
     const { cid } = req.params;
@@ -158,33 +194,7 @@ clearCart = async (req, res) => {
     }
   }
 
-//ACTUALIZO CANTIDAD DE PRODUCTO EN UN EL CARRITO
-updateProductQuantity = async (req, res) => {
-    const { cid, pid } = req.params;
-    const { quantity } = req.body;
-  
-    try {
-      await this.cartService.updateProductQuantity(cid, pid, quantity, res);
-    } catch (error) {
-      console.error("Error al actualizar la cantidad del producto en el carrito:", error);
-      res.status(500).send(`Error al actualizar la cantidad del producto en el carrito: ${error.message}`);
-    }
-  }
-
-//CARRITO CON PRODUCTOS COMPLETOS 
-getPopulatedCart =async (req, res) => {
-    const { cid } = req.params;
-  
-    try {
-      const cart = await this.cartService.getPopulatedCart(cid);
-      res.json(cart);
-    } catch (error) {
-      console.error("Error al obtener el carrito:", error);
-      res.status(500).send("Error al obtener carrito");
-    }
-  }
-
-  // Método para procesar la compra
+  // METODO PARA PROCESAR LAS COMPRAS
 postPurchase =async (req, res)=> {
   const { cid } = req.params;
   
@@ -203,7 +213,6 @@ postPurchase =async (req, res)=> {
           total += item.quantity * item.product.price;
       });
 
-     
 
       // Crear un ticket para la compra
       const ticketData = {
@@ -223,6 +232,10 @@ postPurchase =async (req, res)=> {
       return res.status(500).json({ error: 'Error al procesar la compra' });
   }
 }
+
+
+
+
 }
 // Generar un código único para el ticket
 function generateUniqueCode() {
@@ -232,6 +245,3 @@ function generateUniqueCode() {
 }
 
 
-
-
-  

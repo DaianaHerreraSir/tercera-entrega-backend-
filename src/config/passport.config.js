@@ -10,38 +10,41 @@ import { configObject } from "./connectDB.js";
 
 
 
+
+
 const JWTStrategy = passportJWT.Strategy
 
 const ExtractJWT = passportJWT.ExtractJwt
+
 const {jwt_private_key} = configObject
 const initializePassport = () => {
-
   const cookieExtractor = req => {
-    let token = null
-      if(req && req.cookies){
-        token = req.cookies["cookieToken"]
-      }
-      return token 
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies['cookieToken'];
     }
+    return token;
+};
 
-    passport.use("jwt", new JWTStrategy({
-
-      jwtFromRequest:  ExtractJWT.fromExtractors([cookieExtractor]),
-      secretOrKey: jwt_private_key
-    },async (jwt_payload,done)=>{
-      try {
-        return done (null, jwt_payload)
-      } catch (error) {
-        return done(error)
-        
-      }
-    }))
-
+passport.use('jwt', new JWTStrategy({
+    jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+    secretOrKey: jwt_private_key
+}, async (jwt_payload, done) => {
+    try {
+        const user = await  usersModel.findOne(jwt_payload.sub);
+        if (!user) {
+            return done(null, null, { message: 'Usuario no encontrado' });
+        }
+        return done(null, user);
+    } catch (error) {
+        return done(error);
+    }
+}));
 
     //GITHUB
     passport.use('github', new GitHubStrategy({
       clientID:'Iv1.e5533794a35d6c5a',
-      clientSecret: "",
+      clientSecret: "ce974efa6262864d516399ea0dc999b4719b3cc1",
       callbackURL: 'http://localhost:8083/api/session/githubcallback',
   
     }, async (accessToken, refreshToken, profile, done)=>{

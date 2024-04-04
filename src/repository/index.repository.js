@@ -1,5 +1,5 @@
 import { CartDao, ProductDao, UserDao } from "../daos/factory.js";
-import { CartRepository, CartReposity } from "./carts.repository.js";
+import { CartRepository } from "./carts.repository.js";
 import { ProductRepository } from "./products.repository.js";
 import { UserRepository } from "./user.repository.js";
 

@@ -6,10 +6,13 @@ export const passportCall = strategy => {
             console.log(user);
 
             if (err) return next(err);
-            if (!user) return res.status(401).send({
-                status: "error",
-                error: info.message ? info.message : info.toString()
-            });
+            if (!user) {
+                const errorMessage = info && info.message ? info.message : "Unauthorized";
+                return res.status(401).send({
+                    status: "error",
+                    error: errorMessage
+                });
+            }
 
             req.user = user;
             next();
@@ -17,5 +20,3 @@ export const passportCall = strategy => {
     };
 };
 
-
-export default passportCall

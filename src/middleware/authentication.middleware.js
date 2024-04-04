@@ -1,33 +1,26 @@
-// const authorization = roleaArray =>{
-
-//     return async(req, res, next) =>{
-        
-//         if(roleaArray [0]=== "PUBLIC") return next()
-        
-//         if(!req.user) return res.status(401).json({status: "error", error : "Unauthorized"})
-//          console.log(req.user)
-        
-//         if(!roleaArray.includes(req.user.role)) return res.status(401).json({status: "error", error : "Not permissions"})
-       
-//         next()
-//     }
-
-// }
-
-// export default authorization
 const authorization = roleArray => {
     return (req, res, next) => {
-        if (roleArray[0] === "PUBLIC") return next();
+        console.log("Authorization Middleware Triggered");
 
-        if (!req.user) return res.status(401).json({ status: "error", error: "Unauthorized" });
+    if (roleArray[0] === "PUBLIC") return next();
 
-        if (!roleArray.includes(req.user.role)) return res.status(401).json({ status: "error", error: "Not permissions" });
+    // Verifica si hay un usuario autenticado
+    if (!req.user) {
+        console.log("No se ha autenticado ningún usuario");
+        return res.status(401).json({ status: "error", error: "Unauthorized" });
+    }
 
-        // Asegúrate de que req.user incluya el ID del usuario
-        const userId = req.user._id;
-        console.log("User ID:", userId);
+    // Verifica si el rol del usuario está autorizado
+    if (!roleArray.includes(req.user.role)) {
+        console.log("El usuario no tiene permisos suficientes:", req.user.role);
+        return res.status(401).json({ status: "error", error: "Not permissions" });
+    }
 
-        next();
+    const userId = req.user._id;
+    console.log("User ID:", userId);
+
+    next();
     };
 };
-export default authorization
+
+export default authorization;

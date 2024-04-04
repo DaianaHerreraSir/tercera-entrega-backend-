@@ -1,3 +1,62 @@
+{{!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Productos</title>
+</head>
+<body>
+
+  {{#if status}}
+    <p>Status: {{status}}</p>
+  {{/if}}
+
+
+{{#with user}}
+  {{#if this}}
+    <h1>Bienvenido, {{user.email}} (Rol: {{user.role}})</h1>
+  {{/if}}
+{{/with}}
+    {{#if products}}
+  <h1>Lista de Productos</h1>
+<ul>
+  {{#each products}}
+    <li>
+      <h2>Producto: {{this.title}}</h2>
+      <p>Descripción: {{this.description}}</p>
+      <p>Imagen: {{this.thumbnail}}</p>
+      <p>Precio: {{this.price}}</p>
+      <p>Categoría: {{this.category}}</p>
+
+{{#with payload cartId}}
+  <form action="http://localhost:8083/api/carts/{{#if this}}{{this}}{{else}}ERROR: No se pudo obtener el cartId{{/if}}/products/{{this._id}}" method="POST">
+    <input type="hidden" name="title" value="{{this.title}}">
+    <input type="hidden" name="description" value="{{this.description}}">
+    <input type="hidden" name="price" value="{{this.price}}">
+    <input type="hidden" name="quantity" value="{{this.quantity}}">
+    <input type="hidden" name="cid" value="{{this}}">
+    <button type="submit">Agregar al carrito</button>
+  </form>
+{{/with}}
+    </li>
+  {{/each}}
+</ul>
+<div>
+  {{#if hasPrevPage}}
+      <a href="/products?pageQuery={{prevPage}}">Anterior</a>
+  {{/if}}
+      <label>{{page}}</label>
+  {{#if hasNextPage}}
+      <a href="/products?pageQuery={{nextPage}}">Siguiente</a>
+  {{/if}}
+      </div>
+  {{else}}
+      <p>{{message}}</p>
+  {{/if}}
+
+
+</body> --}}
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,14 +87,16 @@
       <p>Imagen: {{this.thumbnail}}</p>
       <p>Precio: {{this.price}}</p>
       <p>Categoría: {{this.category}}</p>
+      
 
-      <form action="http://localhost:8083/api/carts/65fb20a80f19ae91277ef67d/products/{{this._id}}" method="POST">
+      <form action="http://localhost:8083/api/carts/{{#if cartId}}{{cartId}}{{else}}ERROR: No se pudo obtener el cartId{{/if}}/products/{{this._id}}" method="POST">
         <input type="hidden" name="title" value="{{this.title}}">
         <input type="hidden" name="description" value="{{this.description}}">
         <input type="hidden" name="price" value="{{this.price}}">
         <input type="hidden" name="quantity" value="{{this.quantity}}">
         <button type="submit">Agregar al carrito</button>
       </form>
+    
     </li>
   {{/each}}
 </ul>
@@ -58,4 +119,3 @@
 
 </body>
 </html>
-

@@ -75,7 +75,8 @@ app.post("/file",uploader.single("myFile"),(req,res) =>{
 app.use("/", viewRouter)
 app.use("/api/products",productsRouter);
 app.use("/api/carts", cartsRouter )
-app.use("/carts",cartsRouter)
+
+
 app.use("/chat/message", messagesRouter)
 app.use("/cookie", cookiesRouter)
 app.use("/api/session", sessionRouter)
