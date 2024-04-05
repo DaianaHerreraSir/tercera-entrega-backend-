@@ -7,18 +7,17 @@
 </head>
 <body>
 
-<h1>Carrito de Compras</h1>
-
-{{#with cart}}
-  {{#if products.length}}
-  <ul>
+<h1>Carrito de Compras</h1> 
+{{cart.products}}
+{{#if cart.products}}
+<ul>
     {{#each products}}
     <li>
-      <h2>Producto: {{this.product.title}}</h2>
-      <p>Descripción: {{this.product.description}}</p>
-      <p>Imagen: {{this.product.thumbnail}}</p>
-      <p>Precio: {{this.product.price}}</p>
-      <p>Categoría: {{this.product.category}}</p>
+      {{!-- <h2>Producto: {{this.title}}</h2>
+      <p>Descripción: {{this.description}}</p>
+      <p>Imagen: {{this.thumbnail}}</p>
+      <p>Precio: {{this.price}}</p>
+      <p>Categoría: {{this.category}}</p> --}}
       <p>Cantidad: {{this.quantity}}</p>
     </li>
     {{/each}}
@@ -36,7 +35,7 @@
   {{else}}
       <p>El carrito está vacío.</p>
   {{/if}}
-  {{/with}}
+ 
 </body>
 </html>
 

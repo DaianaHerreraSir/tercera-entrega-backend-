@@ -37,11 +37,13 @@ export class ViewControllers {
                 page
             } = await this.productService.paginate(queryOptions, { limit, page: pageQuery, sort: { price: -1 }, lean: true });
     
-            const user = req.user
+            const {cartID, email}= req.user
+         
             res.render("products", {
                 status: "success",
                 payload: {
-                    user: user,
+                    cartID,
+                    email,
                     products: docs,
                     hasPrevPage,
                     hasNextPage,
@@ -97,9 +99,10 @@ export class ViewControllers {
     
             // datos del carrito asociado al usuario
             const cart = await this.cartService.getCart(cartId);
+            console.log("En la vista cart se encuentran estos productos:", cart);
             
 
-            res.render("carts", { cart: cart });
+            // res.render("carts", { cart: cart });
         } catch (error) {
             console.error("Error al obtener el carrito:", error);
             res.status(500).send("Error al obtener el carrito");

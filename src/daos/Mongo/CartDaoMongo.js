@@ -18,8 +18,9 @@ class CartDaoMongo {
   
   async getCart(cid) {
     try {
-        const cart = await cartModel.findById(cid).populate('products.product');
-        console.log("obtener cart ", cart);
+        const cart = await cartModel.findById(cid).lean();
+        console.log(cart);
+      
 
         return cart; // 
     } catch (error) {

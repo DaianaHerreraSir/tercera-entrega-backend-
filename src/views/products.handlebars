@@ -72,8 +72,8 @@
 
   {{#if payload}}
 
-  {{#if payload.user}}
-      <h1>Bienvenido, {{payload.user.email}} (Rol: {{payload.user.role}})</h1>
+  {{#if payload.email}}
+      {{!-- <h1>Bienvenido, {{payload.user.email}} (Rol: {{payload.user.role}})</h1> --}}
 
     {{/if}}
     {{#if payload.products}}
@@ -89,7 +89,7 @@
       <p>Categoría: {{this.category}}</p>
       
 
-      <form action="http://localhost:8083/api/carts/{{#if cartId}}{{cartId}}{{else}}ERROR: No se pudo obtener el cartId{{/if}}/products/{{this._id}}" method="POST">
+      <form action="http://localhost:8083/api/carts/{{../payload.cartID}}/products/{{this._id}}" method="POST">
         <input type="hidden" name="title" value="{{this.title}}">
         <input type="hidden" name="description" value="{{this.description}}">
         <input type="hidden" name="price" value="{{this.price}}">
@@ -100,7 +100,7 @@
     </li>
   {{/each}}
 </ul>
-
+{{payload.cartID}}
         <div>
         {{#if payload.hasPrevPage}}
           <a href="/products?pageQuery={{payload.prevPage}}">Anterior</a>
