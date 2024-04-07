@@ -24,16 +24,15 @@ const{createCart,
 //creo un carrito
 cartsRouter.post("/", createCart);
 
+//agrego un producto por el id del producto
+
+cartsRouter.post("/:cid/products/:pid", passportCall('jwt'), authorization(['USER']),addProductToCart);
+
 //obtengo el carrito por su id
 cartsRouter.get("/:cid", getCart);
 
 //obtengo el producto del carrito 
 cartsRouter.get('/carts/:cid/products',getCartProducts)
-
-
-//agrego un producto por el id del producto
-
-cartsRouter.post("/:cid/products/:pid", passportCall('jwt'), authorization(['USER']),addProductToCart);
 
 
 //elimino el carrito por su id
@@ -49,7 +48,7 @@ cartsRouter.delete('/api/carts/:cid', clearCart );
 cartsRouter.put('/:cid', updateCartProducts);
 
 // Implementación de la ruta /:cid/purchase
-cartsRouter.post('/:cid/purchase',postPurchase)
+cartsRouter.post('/:cid/purchase', passportCall('jwt'), authorization(['USER']),postPurchase)
 
 
 

@@ -1,6 +1,6 @@
 import cartModel from "../daos/Mongo/models/carts.models.js";
 import { CartDao, ProductDao, TicketsDao, UserDao,} from "../daos/factory.js";
-import { Types } from 'mongoose';
+
 export class CartControllers {
         constructor (){
             this.cartService =new  CartDao()
@@ -41,37 +41,6 @@ createCart = async (req, res) => {
   }
 }
 
-//OBTENGO EL CARRITO POR SU ID
-
-
-getCart =async (req, res) => {
-  const { cid } = req.params;
-
-  try {
-    const cart = await this.cartService.getCart(cid);
-    console.log("obtencion del carrito",cart); 
-    res.render("carts", { cart });
-  } catch (error) {
-    console.error("Error al obtener el carrito:", error);
-    res.status(500).send("Error al obtener carrito");
-  }
-}
-//OBTENER EL PRODUCTO DEL CARRITO 
-
-getCartProducts = async (req, res) => {
-  const { cartId } = req.params;
-
-  try {
-    const products = await this.cartService.getCartProducts(cartId);
-    if (!products) {
-      return res.status(404).json({ error: 'Carrito no encontrado' });
-    }
-    res.json(products);
-  } catch (error) {
-    console.error('Error al obtener los productos del carrito:', error);
-    res.status(500).json({ error: 'Error al obtener los productos del carrito' });
-  }
-}
 
 //AGREGO UN PRODUCTO POR EL ID DEL PRODUCTO
 addProductToCart = async (req, res) => {
@@ -107,20 +76,23 @@ if (!cart) {
 }
 
 // Verificar si el producto ya está en el carrito
-const existingProductIndex = cart.products.findIndex(item => item._id.toString() === pid);
+const existingProductIndex = cart.products.findIndex(item => item.product._id.toString() === pid);
 if (existingProductIndex !== -1) {
   // Si el producto ya está en el carrito, aumentar la cantidad
   cart.products[existingProductIndex].quantity += 1;
 } else {
   // Si el producto no está en el carrito, agregarlo
-  cart.products.push({ _id: pid, quantity: 1 });
+  cart.products.push({ product: pid, quantity: 1 });
 }
 
-// Guardar los cambios en el carrito
-await cart.save();
 
-    // Redirigir al usuario al carrito
-    res.redirect(`/api/carts/${cartId}`);
+// Guardar los cambios en el carrito junto con el total de la compra
+await cartModel.updateOne({ _id: cartId }, { $set: { products: cart.products, } })
+
+// Redirigir al usuario al carrito
+res.redirect(`/api/carts/${cartId}`);
+
+    
   } catch (error) {
     console.error('Error al agregar producto al carrito:', error);
     res.status(500).send('Error al agregar el producto al carrito');
@@ -128,6 +100,51 @@ await cart.save();
 }
 
 
+//OBTENGO EL CARRITO POR SU ID
+
+
+getCart =async (req, res) => {
+  const { cid } = req.params;
+
+  try {
+    const cart = await this.cartService.getCart(cid);
+
+    console.log("obtencion del carrito",cart.products); 
+    // Calcular el total del carrito
+    let totalAmount = 0;
+    cart.products.forEach(item => {
+      totalAmount += item.quantity * item.product.price;
+    });
+
+
+  console.log("el total es", totalAmount);
+
+  res.render("carts", { products: cart.products, cartId: cid, totalAmount: totalAmount });
+
+
+} catch (error) {
+    console.error("Error al obtener el carrito:", error);
+    res.status(500).send("Error al obtener carrito");
+  }
+}
+
+
+//OBTENER EL PRODUCTO DEL CARRITO 
+
+getCartProducts = async (req, res) => {
+  const { cartId } = req.params;
+
+  try {
+    const products = await this.cartService.getCartProducts(cartId);
+    if (!products) {
+      return res.status(404).json({ error: 'Carrito no encontrado' });
+    }
+    res.json(products);
+  } catch (error) {
+    console.error('Error al obtener los productos del carrito:', error);
+    res.status(500).json({ error: 'Error al obtener los productos del carrito' });
+  }
+}
 //ELIMINO EL CARRITO POR SU ID
 deleteCart =async (req, res) => {
     
@@ -194,46 +211,49 @@ clearCart = async (req, res) => {
     }
   }
 
-  // METODO PARA PROCESAR LAS COMPRAS
+// METODO PARA PROCESAR LAS COMPRAS
 postPurchase =async (req, res)=> {
   const { cid } = req.params;
-  
-  try {
-      // Obtener el carrito del usuario
-      const cart = await this.cartService.getCart(cid);
-      
-      // Verificar si el carrito está vacío
-      if (!cart || !cart.products || cart.products.length === 0) {
-          return res.status(400).json({ error: 'El carrito está vacío' });
+try {
+// Obtener el carrito del usuario
+  const cart = await this.cartService.getCart(cid);
+// Verificar si el carrito está vacío
+  if (!cart || !cart.products || cart.products.length === 0) {
+      return res.status(400).json({ error: 'El carrito está vacío' });
       }
       
-      // Calcular el total de la compra
-      let total = 0;
-      cart.products.forEach(item => {
-          total += item.quantity * item.product.price;
+// Calcular el total de la compra
+  let total = 0;
+  cart.products.forEach(item => {
+  total += item.quantity * item.product.price;
       });
 
+  const userEmail = req.user ? req.user.email : null;
+// Crear un ticket para la compra
+  const ticketData = {
+    code: generateUniqueCode(),
+    purchase_datetime: new Date(),
+    amount: total,
+    purchaser:userEmail
+  };
+console.log("ticket", ticketData);
 
-      // Crear un ticket para la compra
-      const ticketData = {
-          code: generateUniqueCode(),
-          purchase_datetime: new Date(),
-          amount: total,
-          purchaser: req.user.email 
-      };
+const ticket = await this.ticketService.createTicket(ticketData);
+// Asignar el ticket al objeto req
+req.ticket = ticket
+console.log("Ticket asignado a req:", ticket);
+;
 
-      const ticket = await this.ticketService.createTicket(ticketData);
+const { code, purchase_datetime, amount, purchaser } = req.ticket;
 
 
-      // Devolver el ticket creado
-      return res.status(200).json(ticket);
-  } catch (error) {
-      console.error('Error al procesar la compra:', error);
-      return res.status(500).json({ error: 'Error al procesar la compra' });
+res.render('purchase', { ticket:{ code, purchase_datetime, amount, purchaser } });
+
+} catch (error) {
+    console.error('Error al procesar la compra:', error);
+    return res.status(500).json({ error: 'Error al procesar la compra' });
   }
 }
-
-
 
 
 }

@@ -84,7 +84,6 @@ app.use("/api/email", emailRouter)
 app.use("/api", userFakeRouter)
 
 //productos actualizado en tiempo real
-
 app.get('/realTimeProducts', async (req, res) => {
         try {
         const allProducts = await productManager.getProducts();

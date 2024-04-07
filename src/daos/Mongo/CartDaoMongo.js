@@ -18,7 +18,7 @@ class CartDaoMongo {
   
   async getCart(cid) {
     try {
-        const cart = await cartModel.findById(cid).lean();
+        const cart = await cartModel.findById(cid).populate("products.product").lean();
         console.log(cart);
       
 
@@ -43,7 +43,7 @@ class CartDaoMongo {
 }
 async getCartProducts(cid) {
   try {
-      const cart = await cartModel.findById(cid).populate('products.product');
+      const cart = await cartModel.findById(cid).populate('products.product').lean();
      
       if (cart) {
           return cart.products

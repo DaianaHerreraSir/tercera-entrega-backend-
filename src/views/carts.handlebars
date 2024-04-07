@@ -8,28 +8,24 @@
 <body>
 
 <h1>Carrito de Compras</h1> 
-{{cart.products}}
-{{#if cart.products}}
+{{#if products.length}}
 <ul>
     {{#each products}}
     <li>
-      {{!-- <h2>Producto: {{this.title}}</h2>
-      <p>Descripción: {{this.description}}</p>
-      <p>Imagen: {{this.thumbnail}}</p>
-      <p>Precio: {{this.price}}</p>
-      <p>Categoría: {{this.category}}</p> --}}
-      <p>Cantidad: {{this.quantity}}</p>
+      <h2>Producto: {{product.title}}</h2>
+      <p>Descripción: {{product.description}}</p>
+      <p>Imagen: {{product.thumbnail}}</p>
+      <p>Precio: {{product.price}}</p>
+      <p>Categoría: {{product.category}}</p>
+      <p>Cantidad: {{quantity}}</p>
     </li>
     {{/each}}
   </ul>
 
 <h3>Total del carrito: {{totalAmount}}</h3>
 
-  {{#if totalPurchaseAmount}}
-        <h3>Total de la compra: {{totalPurchaseAmount}}</h3>
-  {{/if}}
   
-  <form action="http://localhost:8083/api/carts/{{_id}}/purchase" method="POST">
+  <form action="http://localhost:8083/api/carts/{{cartId}}/purchase" method="POST">
   <button type="submit">Finalizar compra</button>
   </form>
   {{else}}

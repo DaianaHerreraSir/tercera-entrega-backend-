@@ -19,9 +19,10 @@ const ticketsSchema = new Schema( {
         type: Number, 
         required: false }, 
 
-    purchaser: { 
-        type: String, 
-        required: false } 
+    purchaser: {
+            type: String,
+            required: true 
+        } 
 
 })
 

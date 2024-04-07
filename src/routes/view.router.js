@@ -10,9 +10,8 @@ const viewRouter = Router();
 const{  getViewProduct,
         viewLogin,
         viewRegister,
-        viewPurchase,
-        viewAddToCart} = new ViewControllers()
-       
+    } = new ViewControllers()
+
 
 
 
@@ -21,10 +20,6 @@ viewRouter.get("/products",passportCall ("jwt"),authorization(['USER']),getViewP
 viewRouter.get("/login",viewLogin )
 
 viewRouter.get("/register", viewRegister)
-
-viewRouter.get("/carts/:cid/purchase", viewPurchase)
-
-viewRouter.get("api/carts/:cid", viewAddToCart);
 
 
 

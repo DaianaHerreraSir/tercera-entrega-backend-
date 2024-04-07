@@ -1,6 +1,6 @@
 
 import ProductsManagerMongo from "../daos/Mongo/ProductsDaoMongo.js";
-import { CartDao } from "../daos/factory.js";
+import { CartDao, TicketsDao } from "../daos/factory.js";
 import exphbs from "express-handlebars";
 import express from "express";
 
@@ -10,6 +10,7 @@ export class ViewControllers {
     constructor() {
         this.productService = new ProductsManagerMongo();
         this.cartService = new CartDao();
+        this.ticketService = new TicketsDao()
     }
 
     // VISTA DE PRODUCTO
@@ -20,7 +21,6 @@ export class ViewControllers {
             let queryOptions = {};
     
             if (query) {
-               
                 queryOptions = {
                     ...queryOptions,
                     //
@@ -72,40 +72,5 @@ export class ViewControllers {
     // VISTA DE REGISTRO
     viewRegister = (req, res) => {
         res.render("register");
-    }
-
-    // VISTA DE COMPRA
-    viewPurchase = (req, res) => {
-        res.render("purchase");
-    }
-
-// VISTA DE AGREGAR CARRITO
-    viewAddToCart = async (req, res) => {
-        const { userId } = req.user; //
-        console.log( "id del usuario", userId);
-    
-        try {
-            // Obtener el ID del carrito asociado al usuario
-            const user = await this.userService.getUserBy(userId);
-            const cartId = user.cartID;
-            console.log("cart del usuario", cartId);
-    
-            // Verificar si el usuario tiene un carrito asociado
-            if (!cartId) {
-                console.error("El usuario no tiene un carrito asociado.");
-                
-                return res.status(404).send("El usuario no tiene un carrito asociado.");
-            }
-    
-            // datos del carrito asociado al usuario
-            const cart = await this.cartService.getCart(cartId);
-            console.log("En la vista cart se encuentran estos productos:", cart);
-            
-
-            // res.render("carts", { cart: cart });
-        } catch (error) {
-            console.error("Error al obtener el carrito:", error);
-            res.status(500).send("Error al obtener el carrito");
-        }
     }
 }    
